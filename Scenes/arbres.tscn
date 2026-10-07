@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://jpnmlhvpb5h"]
+
+[ext_resource type="PackedScene" uid="uid://ciqa21emrcm54" path="res://importsGLB/landscape2.glb" id="1_6wcxr"]
+[ext_resource type="Script" uid="uid://gmcpq4e7mq8w" path="res://Scripts/scatter_arbres.gd" id="2_bd2u0"]
+[ext_resource type="Script" uid="uid://bx1xle6220anu" path="res://Scripts/scatter_species.gd" id="3_ea1h2"]
+
+[node name="arbres" type="Node3D" unique_id=1912428399]
+
+[node name="landscape2" parent="." unique_id=1708163080 instance=ExtResource("1_6wcxr")]
+
+[node name="Node3D" type="Node3D" parent="." unique_id=1241441063]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -121.053085, 173.8136, 319.1781)
+script = ExtResource("2_bd2u0")
+species = Array[ExtResource("3_ea1h2")]([null])
+area_size = 50.0
+drop_height = 50.0

@@ -1,0 +1,31 @@
+# ============================================================
+#  .gitignore — ExplorationExtInt (Godot 4.7)
+#  Approche « code seul » : on versionne scripts, shaders,
+#  petites scènes et config. Les gros binaires restent hors Git.
+# ============================================================
+
+# Cache du moteur (régénéré automatiquement, ~7 Go)
+.godot/
+
+# macOS
+.DS_Store
+
+# --- Gros assets binaires source (sauvegardés hors Git) ---
+*.glb
+*.blend
+*.blend1
+*.exr
+*.hdr
+
+# Dossiers d'assets lourds (meshes source + textures 4K/normal maps)
+/importsGLB/
+/Materials/textures/
+
+# Scène trop lourde pour Git (113 Mo) — à reconvertir en .scn puis réintégrer
+/Scenes/strataWorld.tscn
+
+# Exports / builds
+/build/
+/exports/
+*.pck
+*.zip
