@@ -10,6 +10,7 @@ var _font: Font = null
 var _pseudo: LineEdit
 var _progress: Label
 var _themes: RichTextLabel
+var _standalone := false
 
 func _ready() -> void:
 	layer = 35
@@ -188,7 +189,8 @@ func _fmt(x: float, decimals: bool) -> String:
 	return ("%.4f" % x) if decimals else str(int(round(x)))
 
 # ---------- Ouverture / fermeture ----------
-func open() -> void:
+func open(standalone := false) -> void:
+	_standalone = standalone
 	_refresh()
 	visible = true
 	get_tree().paused = true
@@ -199,7 +201,9 @@ func _on_close() -> void:
 
 func close() -> void:
 	_apply_and_save()
-	visible = false   # retour au menu Pause (visible derrière)
+	visible = false
+	if _standalone:
+		get_tree().paused = false   # ouvert depuis l'accueil : on dépause (pas de Pause derrière)
 
 func _refresh() -> void:
 	_pseudo.text = GameState.pseudo

@@ -11,6 +11,10 @@ extends CharacterBody3D
 @export var bob_amplitude: float = 0.08
 @export var fov_change: float = 0.0
 
+@export_group("Intro")
+## Clé d'info (InfoData) proposée au 1er contact avec le sol (ex. "temps" dans la pyramide). Vide = rien.
+@export var intro_key: String = ""
+
 var speed
 
 const BOB_FREQ = 2.4
@@ -20,6 +24,7 @@ var t_bob = 0.0
 # --- Gestion centralisée du curseur ---
 var _near_count := 0   # nb de zones d'interaction où se trouve le joueur
 var _focused := true   # la fenêtre de jeu est-elle active ?
+var _landed := false   # 1er contact avec le sol (déclenche l'info d'intro)
 
 @onready var head: Node3D = $Head
 @onready var camera: Camera3D = $Head/Camera3D
@@ -113,6 +118,14 @@ func _physics_process(delta):
 	camera.fov = lerp(camera.fov, target_fov, delta * 8.0)
 
 	move_and_slide()
+
+	# Premier contact avec le sol : propose l'info d'intro (allume le « i »).
+	if not _landed and is_on_floor():
+		_landed = true
+		if intro_key != "":
+			var hud := get_node_or_null("/root/HUD")
+			if hud:
+				hud.set_info(intro_key, "")
 
 
 func _headbob(time) -> Vector3:

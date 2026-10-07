@@ -15,6 +15,7 @@ var _body: Label
 var _font: Font = null
 var _pending_dest := ""
 var _pending_key := ""
+var _current_key := ""
 
 func _ready() -> void:
 	layer = 20
@@ -65,12 +66,6 @@ func _ready() -> void:
 	bcol.add_child(_make_button("Aide", "aideButton.png", _on_aide))
 	bcol.add_child(_make_button("Revenir", "revenirButton.png", close))
 
-	await get_tree().process_frame
-	if GameState.premiere_entree:
-		GameState.premiere_entree = false
-		GameState.marquer_etape("temps")   # 1re étape : compte « Temps » + sauvegarde
-		show_box("temps")
-
 func _find_font() -> Font:
 	var dir := DirAccess.open(FONT_DIR)
 	if dir:
@@ -113,6 +108,8 @@ func show_box(key: String) -> void:
 	if not InfoData.BOXES.has(key):
 		push_warning("InfoPanel : clé inconnue '%s'" % key)
 		return
+	_current_key = key
+	GameState.marquer_etape(key)   # le thème est « parcouru » dès qu'on ouvre son panneau
 	var d: Dictionary = InfoData.BOXES[key]
 	_title.text = d.get("titre", "")
 	_subtitle.text = d.get("soustitre", "")
@@ -136,13 +133,15 @@ func close() -> void:
 func _on_explorer() -> void:
 	if _pending_dest != "":
 		var d := _pending_dest
-		var k := _pending_key
 		close()
-		if k != "":
-			GameState.marquer_etape(k)   # mémorise l'étape parcourue
 		get_tree().change_scene_to_file(d)
 	else:
 		close()
 
 func _on_aide() -> void:
-	pass  # (plus tard : page d'aide de cette boîte)
+	var a := InfoData.aide(_current_key)
+	if a == "":
+		return   # pas d'aide rédigée pour ce thème
+	_title.text = "Aide"
+	_subtitle.text = InfoData.label(_current_key)
+	_body.text = a

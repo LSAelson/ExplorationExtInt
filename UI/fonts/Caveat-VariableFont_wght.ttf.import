@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://bjmki65hjbue0"
-path="res://.godot/imported/DancingScript-VariableFont_wght.ttf-49b742c8de4df7501b71ee484d22c090.fontdata"
+uid="uid://dkalmbkbwbqpy"
+path="res://.godot/imported/Caveat-VariableFont_wght.ttf-c8641896ac17b4b1ebfda2ceed4f5319.fontdata"
 
 [deps]
 
-source_file="res://UI/fonts/DancingScript-VariableFont_wght.ttf"
-dest_files=["res://.godot/imported/DancingScript-VariableFont_wght.ttf-49b742c8de4df7501b71ee484d22c090.fontdata"]
+source_file="res://UI/fonts/Caveat-VariableFont_wght.ttf"
+dest_files=["res://.godot/imported/Caveat-VariableFont_wght.ttf-c8641896ac17b4b1ebfda2ceed4f5319.fontdata"]
 
 [params]
 

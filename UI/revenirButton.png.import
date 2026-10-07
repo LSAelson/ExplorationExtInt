@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dj6iime8sk75c"
-path="res://.godot/imported/revenirButton.jpg-127628bbcbcf10f4b59e80d8fc9510f8.ctex"
+uid="uid://c0xutw8uc55jr"
+path="res://.godot/imported/revenirButton.png-d1c25570f9b302f50b0f2a22675e3e8e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://UI/revenirButton.jpg"
-dest_files=["res://.godot/imported/revenirButton.jpg-127628bbcbcf10f4b59e80d8fc9510f8.ctex"]
+source_file="res://UI/revenirButton.png"
+dest_files=["res://.godot/imported/revenirButton.png-d1c25570f9b302f50b0f2a22675e3e8e.ctex"]
 
 [params]
 

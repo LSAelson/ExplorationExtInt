@@ -44,3 +44,18 @@ const LABELS := {
 # Renvoie le libellé littéraire d'une clé (sinon la clé simplement capitalisée).
 func label(cle: String) -> String:
 	return LABELS.get(cle, cle.capitalize())
+
+# ============================================================
+#  PAGES D'AIDE PAR THÈME (bouton « Aide » du panneau)
+#  -> Tu rédiges ici l'aide de chaque thème. Chaîne vide = pas d'aide.
+#  Les retours à la ligne se font avec \n.
+# ============================================================
+const AIDES := {
+	"temps": "",
+	"passe": "",
+	"present": "",
+	"futur": "",
+}
+
+func aide(cle: String) -> String:
+	return AIDES.get(cle, "")

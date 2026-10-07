@@ -1,7 +1,8 @@
 extends CanvasLayer
 
-# HUD global (autoload "HUD") : bouton info (gris/rouge) + bouton profil, en haut à droite.
-# Une stèle appelle HUD.set_info(key, dest) à l'approche, HUD.clear_info() au départ.
+# HUD global (autoload "HUD") : bouton info (gris/rouge), en bas à gauche.
+# Visible seulement en jeu. Le profil se gère via le menu Pause.
+# Une stèle / le sol appelle HUD.set_info(key, dest) ; HUD.clear_info() pour éteindre.
 
 const DIR := "res://UI/"
 const BTN := Vector2(128, 128)
@@ -20,8 +21,6 @@ func _ready() -> void:
 
 	var hbox := HBoxContainer.new()
 	hbox.add_theme_constant_override("separation", 20)
-	# --- Position du groupe de boutons (ici : bas-gauche) ---
-	# Pour changer de coin, joue sur ces ancrages + grow + offsets.
 	hbox.anchor_left = 0.0
 	hbox.anchor_right = 0.0
 	hbox.anchor_top = 1.0
@@ -32,10 +31,15 @@ func _ready() -> void:
 	hbox.offset_bottom = -40
 	add_child(hbox)
 
-	hbox.add_child(_make_btn("profilButton.png", "Profil", _on_profil))
 	_info_btn = _make_btn("infoButtonGrey.png", "i", _on_info)
 	_info_btn.disabled = true
 	hbox.add_child(_info_btn)
+
+func _process(_delta: float) -> void:
+	# N'afficher le HUD qu'en jeu (un joueur présent dans la scène).
+	var in_game := get_tree().get_first_node_in_group("player") != null
+	if visible != in_game:
+		visible = in_game
 
 func _make_btn(png: String, fallback: String, cb: Callable) -> Control:
 	var path := DIR + png
@@ -53,8 +57,12 @@ func _make_btn(png: String, fallback: String, cb: Callable) -> Control:
 	b.pressed.connect(cb)
 	return b
 
-# --- API appelée par les stèles ---
+# --- API appelée par les stèles / le sol ---
 func set_info(key: String, dest: String) -> void:
+	# Pas d'info si vide ou déjà explorée (le thème reste accessible via le profil).
+	if key == "" or GameState.a_visite(key):
+		clear_info()
+		return
 	_key = key
 	_dest = dest
 	_set_active(true)
@@ -71,12 +79,17 @@ func _set_active(active: bool) -> void:
 	else:
 		_info_btn.modulate = Color(1.0, 0.4, 0.4) if active else Color.WHITE
 
+func _unhandled_input(event: InputEvent) -> void:
+	# Touche I : ouvre l'info disponible (le « i » rouge) sans avoir besoin du curseur.
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_I:
+		if not get_tree().paused and _key != "":
+			_on_info()
+			get_viewport().set_input_as_handled()
+
 func _on_info() -> void:
 	if _key != "":
 		InfoPanel.show_for_stele(_key, _dest)
-
-func _on_profil() -> void:
-	pass  # (plus tard : ouvrir le menu profil)
+		clear_info()   # thème exploré -> « i » gris (rallumé par une nouvelle zone)
 
 func _tex(png: String) -> Texture2D:
 	var path := DIR + png
