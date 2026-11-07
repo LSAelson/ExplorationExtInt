@@ -218,18 +218,29 @@ func _refresh_themes() -> void:
 	var s := ""
 	for key in keys:
 		var k := str(key)
-		var date := str(GameState.etapes_visitees[key])
-		s += "• [url=%s][color=#fff9b8]%s[/color][/url]   [color=#888888](%s)[/color]\n" % [k, InfoData.label(k), date]
+		s += "• [url=lire:%s][color=#fff9b8]%s[/color][/url]" % [k, InfoData.label(k)]
+		if GameState.lieux.has(k):
+			s += "   [url=aller:%s][color=#88c0ff]↦ s'y rendre[/color][/url]" % k
+		s += "\n"
 	_themes.text = s
 
 func _on_theme_clicked(meta) -> void:
-	# Ferme les menus et ouvre la page du thème (lecture). Retour au jeu via « Revenir ».
-	var key := str(meta)
+	# meta = "lire:<clé>" (relire l'info) ou "aller:<clé>" (se téléporter devant la stèle).
+	var m := str(meta)
+	var action := "lire"
+	var key := m
+	if ":" in m:
+		var parts := m.split(":")
+		action = parts[0]
+		key = parts[1]
 	visible = false
 	var pm := get_node_or_null("/root/PauseMenu")
 	if pm:
 		pm.visible = false
-	InfoPanel.show_box(key)
+	if action == "aller":
+		GameState.teleporter_vers(key)   # téléportation devant la stèle
+	else:
+		InfoPanel.show_box(key)
 
 func _apply_and_save() -> void:
 	GameState.pseudo = _pseudo.text

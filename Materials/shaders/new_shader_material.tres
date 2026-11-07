@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://dcpouds1uey82"]
+
+[ext_resource type="Shader" uid="uid://bcy2ngqjeo0m5" path="res://Materials/shaders/marble.gdshader" id="1_23ncy"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_23ncy")
+shader_parameter/base_color = Color(0.92, 0.9, 0.86, 1)
+shader_parameter/vein_color = Color(0.2, 0.9, 1, 1)
+shader_parameter/vein_scale = 2.5
+shader_parameter/vein_sharpness = 1.8
+shader_parameter/turbulence = 4.0
+shader_parameter/rough = 0.3

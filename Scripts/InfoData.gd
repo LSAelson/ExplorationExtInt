@@ -11,7 +11,7 @@ extends Node
 const BOXES := {
 	"temps": {
 		"titre": "Observation primitive sur le Temps",
-		"soustitre": "Trois voies seront proposées.\nLe Passé, le Présent et le Futur.",
+		"soustitre": "Trois voies sont présentes.\nLe Passé, le Présent et le Futur.",
 		"corps": "Il est conseillé de les parcourir dans l'ordre\nchronologique. Compliqué de se projeter dans\nl'avenir sans avoir domestiqué les fantômes\ndu passé. Quant au Présent...\nIl est justement en jeu !",
 	},
 	"present": {
@@ -51,10 +51,10 @@ func label(cle: String) -> String:
 #  Les retours à la ligne se font avec \n.
 # ============================================================
 const AIDES := {
-	"temps": "",
-	"passe": "",
-	"present": "",
-	"futur": "",
+	"temps": "Trouve les 3 Voix dans l'ordre.",
+	"passe": "Trouve la stèle du Temps avant.\nSi c'est fait, explore et trouve\n celle qui aide à décoder.",
+	"present": "Une autre voie doit être prise auparavant.",
+	"futur": "Dernière voie à emprunter.",
 }
 
 func aide(cle: String) -> String:

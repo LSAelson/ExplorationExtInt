@@ -26,6 +26,24 @@ var fov_max := 50.0
 # --- Audio ---
 var volume_master := 1.0
 
+# --- Observations ---
+var resultats: Dictionary = {}   # { "temps": { "qcm1": {"valeur":…, "horodatage":…} } } (sauvegardé)
+var observation_a_ouvrir := ""   # transitoire : quelle Observation charger
+var scene_retour := ""           # transitoire : scène 3D où revenir après l'Observation
+
+# --- Position de retour (transitoire) : re-placer le joueur près de la stèle ---
+var retour_scene := ""
+var retour_position := Vector3.ZERO
+var retour_rotation_y := 0.0
+var a_position_retour := false
+
+# --- Lieux des stèles visitées (sauvegardé) : étape -> où le joueur se tenait ---
+var lieux: Dictionary = {}
+
+# --- Carte des Observations (sauvegardé) ---
+var priorites: Array = []                   # clés d'observation épinglées comme priorité
+var observations_decouvertes: Array = []    # clés découvertes (ouverture / approche)
+
 signal etape_marquee(cle: String)           # pour rafraîchir le HUD/menu profil
 
 func _ready() -> void:
@@ -45,6 +63,63 @@ func a_visite(cle: String) -> bool:
 func nb_etapes() -> int:
 	return etapes_visitees.size()
 
+# ---------- Lieux (téléportation depuis le profil) ----------
+func enregistrer_lieu(key: String, scene: String, pos: Vector3, rot: float) -> void:
+	if key == "":
+		return
+	lieux[key] = {"scene": scene, "px": pos.x, "py": pos.y, "pz": pos.z, "rot": rot}
+	save_game()
+
+func teleporter_vers(key: String) -> bool:
+	if not lieux.has(key):
+		return false
+	var l: Dictionary = lieux[key]
+	retour_scene = l.get("scene", "")
+	retour_position = Vector3(l.get("px", 0.0), l.get("py", 0.0), l.get("pz", 0.0))
+	retour_rotation_y = l.get("rot", 0.0)
+	a_position_retour = true
+	get_tree().paused = false
+	get_tree().change_scene_to_file(retour_scene)
+	return true
+
+# ---------- Résultats d'observations (QCM, répartitions…) ----------
+func enregistrer_resultat(obs: String, section: String, valeur) -> void:
+	if not resultats.has(obs):
+		resultats[obs] = {}
+	resultats[obs][section] = {
+		"valeur": valeur,
+		"horodatage": Time.get_datetime_string_from_system(false, true),
+	}
+	save_game()
+
+func resultat(obs: String, section: String):
+	if resultats.has(obs) and resultats[obs].has(section):
+		return resultats[obs][section]
+	return null
+
+# ---------- Carte : priorités & découvertes ----------
+func basculer_priorite(cle: String) -> bool:
+	if cle == "":
+		return false
+	if priorites.has(cle):
+		priorites.erase(cle)
+	else:
+		priorites.append(cle)
+	save_game()
+	return priorites.has(cle)
+
+func est_priorite(cle: String) -> bool:
+	return priorites.has(cle)
+
+func decouvrir(cle: String) -> void:
+	if cle == "" or observations_decouvertes.has(cle):
+		return
+	observations_decouvertes.append(cle)
+	save_game()
+
+func est_decouverte(cle: String) -> bool:
+	return observations_decouvertes.has(cle)
+
 # ---------- Focale ----------
 func set_fov(v: float) -> void:
 	fov = clampf(v, fov_min, fov_max)
@@ -62,6 +137,10 @@ func save_game() -> void:
 		"headbob": headbob,
 		"fov": fov,
 		"volume_master": volume_master,
+		"resultats": resultats,
+		"lieux": lieux,
+		"priorites": priorites,
+		"observations_decouvertes": observations_decouvertes,
 	}
 	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if f:
@@ -89,10 +168,18 @@ func load_game() -> void:
 	headbob = data.get("headbob", headbob)
 	fov = data.get("fov", fov)
 	volume_master = data.get("volume_master", volume_master)
+	resultats = data.get("resultats", resultats)
+	lieux = data.get("lieux", lieux)
+	priorites = data.get("priorites", priorites)
+	observations_decouvertes = data.get("observations_decouvertes", observations_decouvertes)
 
 # ---------- Nouveau jeu ----------
 func nouveau_jeu(nom: String = "") -> void:
 	pseudo = nom
 	premiere_entree = true
 	etapes_visitees = {}
+	resultats = {}
+	lieux = {}
+	priorites = []
+	observations_decouvertes = []
 	save_game()

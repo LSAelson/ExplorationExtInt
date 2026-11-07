@@ -1,21 +1,21 @@
 extends CanvasLayer
 
-# HUD global (autoload "HUD") : bouton info (gris/rouge), en bas à gauche.
-# Visible seulement en jeu. Le profil se gère via le menu Pause.
-# Une stèle / le sol appelle HUD.set_info(key, dest) ; HUD.clear_info() pour éteindre.
+# HUD global (autoload "HUD") : le bouton « i », en bas à gauche.
+# Apparaît près de TOUTE stèle (curseur libre) : ROUGE si non visitée, GRIS si visitée.
+# Un clic — ou la touche I — déclenche exactement la même chose qu'un clic sur le symbole.
 
-const DIR := "res://UI/"
+const DIR := "res://UI/buttons/"
 const BTN := Vector2(128, 128)
 
 var _info_btn: Control
 var _grey: Texture2D
 var _red: Texture2D
-var _key := ""
-var _dest := ""
+var _teleporter: Node = null
 
 func _ready() -> void:
 	layer = 10
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	visible = false
 	_grey = _tex("infoButtonGrey.png")
 	_red = _tex("infoButtonRed.png")
 
@@ -31,15 +31,29 @@ func _ready() -> void:
 	hbox.offset_bottom = -40
 	add_child(hbox)
 
-	_info_btn = _make_btn("infoButtonGrey.png", "i", _on_info)
-	_info_btn.disabled = true
+	_info_btn = _make_btn("infoButtonRed.png", "i", _on_info)
 	hbox.add_child(_info_btn)
 
 func _process(_delta: float) -> void:
-	# N'afficher le HUD qu'en jeu (un joueur présent dans la scène).
-	var in_game := get_tree().get_first_node_in_group("player") != null
-	if visible != in_game:
-		visible = in_game
+	if not _doit_afficher():
+		if visible:
+			visible = false
+		return
+	if _info_btn is TextureButton:
+		var visite := GameState.a_visite(_teleporter.info_key)
+		(_info_btn as TextureButton).texture_normal = _grey if visite else _red
+	visible = true
+
+func _doit_afficher() -> bool:
+	if _teleporter == null or not is_instance_valid(_teleporter):
+		return false
+	if get_tree().get_first_node_in_group("player") == null:
+		return false
+	if get_tree().paused:
+		return false
+	if Input.mouse_mode != Input.MOUSE_MODE_VISIBLE:
+		return false                               # seulement curseur libre
+	return true
 
 func _make_btn(png: String, fallback: String, cb: Callable) -> Control:
 	var path := DIR + png
@@ -57,39 +71,22 @@ func _make_btn(png: String, fallback: String, cb: Callable) -> Control:
 	b.pressed.connect(cb)
 	return b
 
-# --- API appelée par les stèles / le sol ---
-func set_info(key: String, dest: String) -> void:
-	# Pas d'info si vide ou déjà explorée (le thème reste accessible via le profil).
-	if key == "" or GameState.a_visite(key):
-		clear_info()
-		return
-	_key = key
-	_dest = dest
-	_set_active(true)
+# --- API appelée par les stèles ---
+func set_info_from(teleporter: Node) -> void:
+	_teleporter = teleporter
 
 func clear_info() -> void:
-	_key = ""
-	_dest = ""
-	_set_active(false)
-
-func _set_active(active: bool) -> void:
-	_info_btn.disabled = not active
-	if _info_btn is TextureButton:
-		(_info_btn as TextureButton).texture_normal = _red if active else _grey
-	else:
-		_info_btn.modulate = Color(1.0, 0.4, 0.4) if active else Color.WHITE
-
-func _unhandled_input(event: InputEvent) -> void:
-	# Touche I : ouvre l'info disponible (le « i » rouge) sans avoir besoin du curseur.
-	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_I:
-		if not get_tree().paused and _key != "":
-			_on_info()
-			get_viewport().set_input_as_handled()
+	_teleporter = null
 
 func _on_info() -> void:
-	if _key != "":
-		InfoPanel.show_for_stele(_key, _dest)
-		clear_info()   # thème exploré -> « i » gris (rallumé par une nouvelle zone)
+	if _teleporter != null and is_instance_valid(_teleporter) and _teleporter.has_method("declencher"):
+		_teleporter.declencher()   # identique au clic sur le symbole
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_I:
+		if not get_tree().paused and _teleporter != null:
+			_on_info()
+			get_viewport().set_input_as_handled()
 
 func _tex(png: String) -> Texture2D:
 	var path := DIR + png

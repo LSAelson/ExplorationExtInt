@@ -69,6 +69,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			return   # hors jeu (écran d'accueil) : Échap n'ouvre pas la pause
 		if InfoPanel.visible:
 			InfoPanel.close()
+		elif Carte.visible:
+			Carte.fermer()
 		elif visible:
 			_resume()
 		else:

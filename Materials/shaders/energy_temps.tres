@@ -1,0 +1,17 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://4hr813gletq2"]
+
+[ext_resource type="Shader" uid="uid://bxjsiv0nyv375" path="res://Materials/shaders/sf_metal.gdshader" id="1_2hvfk"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_2hvfk")
+shader_parameter/metal_color = Color(0, 0.16499998, 0.55, 1)
+shader_parameter/metallic_val = 0.038000001805
+shader_parameter/roughness_val = 0.35
+shader_parameter/panel_scale = 352.36
+shader_parameter/groove_width = 0.03
+shader_parameter/vein_color = Color(0.2, 0.9, 1, 1)
+shader_parameter/vein_spacing = 0.01
+shader_parameter/vein_width = 0.00800000038
+shader_parameter/vein_glow = 3.0
+shader_parameter/vein_pulse = 0.0

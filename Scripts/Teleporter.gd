@@ -8,8 +8,19 @@ extends Node3D
 @export var button_node: String = "coupDePoing"
 ## Clé de la boîte d'info à ouvrir au clic (dans InfoData). Vide = téléporte directement.
 @export var info_key: String = ""
+## Cochez si cette stèle ouvre une Observation 2D (bouton « Observer ») au lieu d'un monde 3D.
+@export var is_observation: bool = false
+## Clé de l'Observation (dans ObservationData) à lancer si is_observation.
+@export var observation_key: String = ""
+## Étape requise pour accéder à cette stèle (dans GameState). Vide = toujours ouverte.
+@export var requiert_etape: String = ""
+## Message affiché au clic si la stèle est verrouillée.
+@export var message_verrouille: String = "Cette voie n'est pas encore ouverte."
 
 var _player_near := false
+
+func _est_verrouille() -> bool:
+	return requiert_etape != "" and not GameState.a_visite(requiert_etape)
 
 func _ready() -> void:
 	get_viewport().physics_object_picking = true
@@ -65,7 +76,7 @@ func _on_body_entered(body: Node) -> void:
 		if info_key != "":
 			var hud := get_node_or_null("/root/HUD")
 			if hud:
-				hud.set_info(info_key, destination)
+				hud.set_info_from(self)   # « i » pour toute stèle (gris/rouge selon visite)
 
 func _on_body_exited(body: Node) -> void:
 	if body.name == "Player":
@@ -82,9 +93,21 @@ func _on_button_input(_camera: Node, event: InputEvent, _pos: Vector3, _normal: 
 		return
 	if not (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
 		return
-	if info_key != "":
-		InfoPanel.show_for_stele(info_key, destination)   # ouvre la boîte -> Explorer lancera le monde
+	declencher()
+
+# Déclenche l'action de la stèle — appelée par le clic sur le symbole ET par le « i ».
+func declencher() -> void:
+	if _est_verrouille():
+		InfoPanel.show_message("Voie verrouillée", message_verrouille, info_key)
+		return
+	var p := get_tree().get_first_node_in_group("player")
+	if p and p.has_method("enregistrer_lieu"):
+		p.enregistrer_lieu(info_key)   # mémorise où se tient le joueur, pour le profil
+	if is_observation:
+		InfoPanel.show_for_observation(info_key, observation_key)  # « Observer » -> scène 2D
+	elif info_key != "":
+		InfoPanel.show_for_stele(info_key, destination)            # « Explorer » -> monde 3D
 	elif destination != "":
-		get_tree().change_scene_to_file(destination)       # téléport direct si pas d'info
+		get_tree().change_scene_to_file(destination)
 	else:
 		push_warning("Teleporter : ni info_key ni destination sur " + name)

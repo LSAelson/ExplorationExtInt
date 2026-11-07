@@ -20,6 +20,11 @@
 # Dossiers d'assets lourds (meshes source + textures 4K/normal maps)
 /importsGLB/
 /Materials/textures/
+/blenderExports/
+/mesh/
+
+# Fichiers temporaires Godot (renommage de dépendances)
+*.depren
 
 # Scène trop lourde pour Git (113 Mo) — à reconvertir en .scn puis réintégrer
 /Scenes/strataWorld.tscn

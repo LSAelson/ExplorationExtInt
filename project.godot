@@ -23,11 +23,14 @@ config/icon="res://icon.svg"
 
 GameState="*res://Scripts/GameState.gd"
 InfoData="*res://Scripts/InfoData.gd"
+ObservationData="*res://Scripts/ObservationData.gd"
+RepereData="*res://Scripts/RepereData.gd"
 InfoPanel="*res://Scripts/InfoPanel.gd"
 HUD="*res://Scripts/HUD.gd"
 PauseMenu="*res://Scripts/PauseMenu.gd"
 ProfilReglages="*res://Scripts/ProfilReglages.gd"
 _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
+Carte="*res://Scripts/Carte.gd"
 
 [display]
 

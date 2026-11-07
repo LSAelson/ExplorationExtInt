@@ -2,8 +2,8 @@ extends Node3D
 
 @export_group("Lumière")
 @export var light_color: Color = Color(1.0, 0.6, 0.25)
-@export var light_energy: float = 2.5
-@export var light_range: float = 9.0
+@export var light_energy: float = 4.5
+@export var light_range: float = 12.0
 ## 0 = stable, 1 = très tremblant
 @export_range(0.0, 1.0) var flicker_amount: float = 0.35
 @export var flicker_speed: float = 8.0
